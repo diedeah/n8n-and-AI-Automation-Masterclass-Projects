@@ -1,0 +1,524 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -336,
+        -80
+      ],
+      "id": "e3c7d350-d4d3-4537-97f2-460ba4d3745b",
+      "name": "When chat message received",
+      "webhookId": "REPLACE_WITH_WEBHOOK_ID"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Your job is to analyze the keyword of the question and output it as a single word.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -112,
+        -80
+      ],
+      "id": "e464551c-8dbb-4577-9c5c-ce20a8a9c226",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        176
+      ],
+      "id": "27d4c359-ab48-454e-910c-bd790d76cca3",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "REPLACE_WITH_YOUR_OPENROUTER_ID",
+          "name": "REPLACE_WITH_YOUR_OPENROUTER_ACCOUNT_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://cointelegraph.com/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -944
+      ],
+      "id": "75218bb2-2d06-4776-9f9c-c4f6471ec800",
+      "name": "Coin Telegaraph"
+    },
+    {
+      "parameters": {
+        "url": "https://decryptmedia.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -752
+      ],
+      "id": "e6208526-f57b-4851-be01-1f602f4ff89f",
+      "name": "Decrypt Media"
+    },
+    {
+      "parameters": {
+        "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -560
+      ],
+      "id": "fcb8f7a8-aabf-469c-8111-d1232241bfa0",
+      "name": "Coin Desk"
+    },
+    {
+      "parameters": {
+        "url": "https://bitcoinist.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -368
+      ],
+      "id": "f66642cb-9c66-40cf-9199-d08121380309",
+      "name": "Bitcoinst"
+    },
+    {
+      "parameters": {
+        "url": "https://www.newsbtc.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -176
+      ],
+      "id": "20c64cb0-672e-4018-a4fb-a2ab753a3cde",
+      "name": "News BTC"
+    },
+    {
+      "parameters": {
+        "url": "https://cryptoslate.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        16
+      ],
+      "id": "e86cee9c-88d5-4e16-b330-4b3789224bce",
+      "name": "Crypto Slate"
+    },
+    {
+      "parameters": {
+        "url": "https://cryptopotato.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        208
+      ],
+      "id": "f9ac7d75-bf35-4d34-a653-4fd37d4c8567",
+      "name": "Crypto Potato"
+    },
+    {
+      "parameters": {
+        "url": "https://99bitcoins.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        400
+      ],
+      "id": "53941ca1-4c8d-42bf-80ad-0c3613e1f83d",
+      "name": "99 Bitcoins"
+    },
+    {
+      "parameters": {
+        "url": "https://cryptobriefing.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        592
+      ],
+      "id": "37db0abf-29d5-4d72-854e-914c8846571d",
+      "name": "Crypto Briefing"
+    },
+    {
+      "parameters": {
+        "url": "https://crypto.news/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        784
+      ],
+      "id": "c33d02d4-41d7-46d0-9f82-381763482b10",
+      "name": "Crypto News"
+    },
+    {
+      "parameters": {
+        "numberInputs": 10
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        464,
+        -208
+      ],
+      "id": "53102551-0eee-4b6a-8ed7-81ec4254ec84",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const term = $('AI Agent').first().json.output;\nreturn items.filter(item => {\n  const j            = item.json;\n  const title        = (j.title || \"\").toLowerCase();\n  const snippet      = (j.contentSnippet || j.description || \"\").toLowerCase();\n  const fullContent  = (j.content || \"\").toLowerCase();\n  return title.includes(term)\n      || snippet.includes(term)\n      || fullContent.includes(term);\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -80
+      ],
+      "id": "b4554cec-1e95-4a13-8ff4-73b29538a232",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const q   = $('AI Agent').first().json.output;\nconst list = items\n  .map(i => `- ${i.json.title} (${i.json.link})`)\n  .join(\"\\n\");\nconst prompt = `\nYou are a crypto-industry news analyst.\nSummarize current news and market sentiment for **${q}** based on these articles:\n${list}\n \nAnswer in 3 parts:\n1. Summary of News\n2. Market Sentiment\n3. Links to reference news articles\n`;\n \nreturn [{ json: { prompt } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        -80
+      ],
+      "id": "56ed8c35-cc98-42dd-9151-29b36ba29acf",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }}"
+            },
+            {
+              "content": "You are a crypto‐industry news analyst. Summarize sentiment clearly and concisely."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1184,
+        -80
+      ],
+      "id": "c046697b-e13c-4571-8703-13c232b6aba9",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_ID",
+          "name": "REPLACE_WITH_OPENAI_ACCOUNT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        1552,
+        -80
+      ],
+      "id": "43d07be8-63c7-466c-835c-60369ea24d72",
+      "name": "Chat",
+      "webhookId": "fa65479a-dd29-4b09-b97c-de785ec71bea"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Crypto News",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crypto Briefing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "99 Bitcoins",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crypto Potato",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crypto Slate",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "News BTC",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Bitcoinst",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Coin Desk",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Decrypt Media",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Coin Telegaraph",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coin Telegaraph": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decrypt Media": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Coin Desk": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Bitcoinst": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "News BTC": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Crypto Slate": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Crypto Potato": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "99 Bitcoins": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "Crypto Briefing": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 8
+          }
+        ]
+      ]
+    },
+    "Crypto News": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 9
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REPLACE_WITH_N8N_INSTANCE"
+  }
+}

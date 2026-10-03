@@ -1,0 +1,311 @@
+
+{
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Refund",
+        "formDescription": "Ask for a refund",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "John Doerns"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "placeholder": "example@email.com"
+            },
+            {
+              "fieldLabel": "Amount",
+              "fieldType": "number",
+              "placeholder": "20"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        96
+      ],
+      "id": "088137f9-eb4c-4ffb-89db-c7835d2aa413",
+      "name": "On form submission",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5507edaa-e582-418c-9de2-58948c00132e",
+              "leftValue": "={{ $json.Amount }}",
+              "rightValue": 100,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        96
+      ],
+      "id": "21802a8e-0df4-4780-b98f-32b20edd35e6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "=Refunded  {{ $('On form submission').item.json.Amount }}",
+        "message": "Your refund has been granted.",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "240545b7-6e28-4a89-a486-e252455889c7",
+      "name": "Send a message",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_IDc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_ACCOUNT_ID",
+          "name": "REPLACE_WITH_GMAIL_ACCOUNT_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_WITH_DISCORD_SERVER_ID"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_DISCORD_CHANNEL_ID",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "REPLACE_WITH_YOUR_DISCORD_CACHED_LINK"
+        },
+        "content": "=Refund request:\n\n{{ $json.Name }}\n{{ $json.Email }}\n{{ $json.Amount }}\n\nPlease decide on this request:\nApprove: {{ $execution.resumeUrl }}&decision=true\nDisaapprove: {{ $execution.resumeUrl }}&decision=false",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        448,
+        176
+      ],
+      "id": "9cd1186e-7790-4d2b-bddf-9cae891df6b7",
+      "name": "Send a message1",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "credentials": {
+        "discordOAuth2Api": {
+          "id": "REPLACE_WITH_DISCORD_ACCOUNT_ID",
+          "name": "REPLACE_WITH_DISCORD_ACCOUNT_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "limitWaitTime": true,
+        "resumeAmount": 24,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        176
+      ],
+      "id": "d1fd99a3-130d-41c1-b583-3302b464f59f",
+      "name": "Wait",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOKID"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e24dea9f-865a-4334-941d-2089c7b03fea",
+              "leftValue": "={{ $json.query.decision.toBoolean() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        176
+      ],
+      "id": "0e7fbe52-d735-4e4b-bf69-b1236d8932f7",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "5516b797-c312-41e1-832a-b9b0f0d8890d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Refund denied!",
+        "message": "Refund denied",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        224
+      ],
+      "id": "12c98631-e794-46e3-9965-70fb8d73053a",
+      "name": "Send a message2",
+      "webhookId": "REPLACE_WITH_YOUR_WEBHOOK_ID",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "NCfK2UXrWAj1VnKR",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3d19e4a4c82f91d40439935f81de59b5903e7aeb5d48f1ca45101d852df3fa97"
+  }
+}
