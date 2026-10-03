@@ -1,0 +1,181 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f1c8a78d-c187-462b-ae9b-42acfabe4955",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa9bcf6e-9eef-4770-9c5b-bbe6dd7826f0",
+              "name": "type",
+              "value": "line",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "56856616-6512-4c08-a635-b5c1768d9d4f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE",
+          "mode": "list",
+          "cachedResultName": "ecommerce_kpi_dataset.csv",
+          "cachedResultUrl": "REPLACE"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 64408298,
+          "mode": "list",
+          "cachedResultName": "ecommerce_kpi_dataset",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Q1v97FuZAxYOAHTWinJR8sQWxwjZZQMddPUVOecdpyM/edit#gid=64408298"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        0
+      ],
+      "id": "d35f8f29-3886-4425-9e31-d3e9936c17a3",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE",
+          "name": "REPLACE"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = items.map(i => i.json);\n \n// Extract 'Month' and 'Revenue ($)'\nconst labels = rows.map(r => r[\"Month\"]);\nconst values = rows.map(r => Number(r[\"Revenue ($)\"]));\n \n// Output for QuickChart\nreturn [\n  {\n    json: {\n      chartData: {\n        type: $('Edit Fields').first().json.type,\n        data: {\n          labels,\n          datasets: [{\n            label: \"Monthly Revenue ($)\",\n            data: values,\n            fill: false,\n            borderWidth: 2,\n            tension: 0.3,\n            pointRadius: 2\n          }]\n        },\n        options: {\n          responsive: true,\n          plugins: { legend: { display: true } },\n          scales: {\n            y: { beginAtZero: false },\n            x: { ticks: { autoSkip: true } }\n          }\n        }\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "410d9d7e-d9ca-406f-8b03-0564bac52ca6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://quickchart.io/chart",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chart",
+              "value": "={{ $json.chartData }}"
+            },
+            {
+              "name": "width",
+              "value": "1000"
+            },
+            {
+              "name": "height",
+              "value": "500"
+            },
+            {
+              "name": "format",
+              "value": "png"
+            },
+            {
+              "name": "backgroundColor",
+              "value": "white"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        0
+      ],
+      "id": "cb64825c-4b87-44c5-9a8a-d0f2d9934d86",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3d19e4a4c82f91d40439935f81de59b5903e7aeb5d48f1ca45101d852df3fa97"
+  }
+}

@@ -1,0 +1,311 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "329afb00-00c9-4a02-957f-ef437a42eef4",
+      "name": "When chat message received",
+      "webhookId": "REPLACE"
+    },
+    {
+      "parameters": {
+        "url": "https://api.imgflip.com/get_memes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "07826100-ddb9-49d4-8ef6-552e719bc61b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"template_name\": \"Exact template name from the list\",\n\t\"text0\": \"First box text\", \n    \"text1\": \"Second box text\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        816,
+        240
+      ],
+      "id": "d9b4cbac-8733-40fe-8cad-1338ab67be1c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgflip.com/caption_image",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "template_id",
+              "value": "={{ $json.template_id }}"
+            },
+            {
+              "name": "username",
+              "value": "={{ $json.username }}"
+            },
+            {
+              "name": "password",
+              "value": "={{ $json.password }}"
+            },
+            {
+              "name": "text0",
+              "value": "={{ $json.text0 }}"
+            },
+            {
+              "name": "text1",
+              "value": "={{ $json.text1 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1472,
+        0
+      ],
+      "id": "3dd83ac2-a9fd-46bb-885f-1c90df580e35",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "826e13fd-3a1d-434e-aafc-687429b2c7ba",
+              "name": "REPLACE",
+              "value": "REPLACE",
+              "type": "string"
+            },
+            {
+              "id": "e7088587-c6d3-4dd0-951a-1cf2bcd3fa8b",
+              "name": "REPLACE",
+              "value": "REPLACE",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "4697cf79-aa77-4a46-bdae-c43b62bc05f4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        688,
+        240
+      ],
+      "id": "80febeb7-1d85-41ad-b4dd-9abc7565e8fb",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "REPLACE",
+          "name": "REPLACE"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User input:{{ $('When chat message received').item.json.chatInput }}\n\nAvailable meme template:\n{{ $json.list }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a meme generator. Pick the ONE template from the list that best fits the user's idea.\nCopy the template name EXACTLY as written in the list. Never invent a name.\nIf the idea asks for a template that isn't listed, choose the closest one.\nWrite short, funny text for text0 (top) and text1 (bottom).\nReturn only the structured output."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "b57d8044-6f28-47d0-802f-00cda7554306",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = $input.first().json.output;\nconst memes = $('Filter Templates').first().json.memes;\nconst norm = s => String(s || '').toLowerCase().trim();\n\nlet match =\n  memes.find(m => norm(m.name) === norm(out.template_name)) ||\n  memes.find(m => norm(m.name).includes(norm(out.template_name)) ||\n                  norm(out.template_name).includes(norm(m.name)));\n\nif (!match) match = memes.find(m => m.name === 'Drake Hotline Bling'); // fallback\n\nreturn [{ json: {\n  template_id: match.id,\n  template_name: match.name,\n  text0: out.text0,\n  text1: out.text1\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "e01065b6-5252-440d-b933-7dd97ce9d266",
+      "name": "Lookup Template"
+    },
+    {
+      "parameters": {
+        "jsCode": "const memes = $input.first().json.data.memes\n  .filter(m => m.box_count === 2)   // only 2-box templates, since you use text0/text1\n  .map(m => ({ id: m.id, name: m.name }));\n\nreturn [{ json: { memes, list: memes.map(m => m.name).join('\\n') } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "aac84467-aaf5-4c57-9e9c-4951c0059764",
+      "name": "Filter Templates"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1674e048-31fc-4a0a-aea0-875a6d70f1d6",
+              "name": "output",
+              "value": "=![generated meme]({{ $json.data.url }})",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1696,
+        0
+      ],
+      "id": "f0d6420d-d580-437a-bb03-41973c007801",
+      "name": "Generated Image meme"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Filter Templates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Generated Image meme",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Lookup Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Template": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Templates": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REPLACE"
+  }
+}

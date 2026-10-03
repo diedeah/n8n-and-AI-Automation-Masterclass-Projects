@@ -1,0 +1,154 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "joke_bot",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5c8044d5-3806-4979-bdb1-39e86a09ee2d",
+      "name": "Webhook",
+      "webhookId": "REPLACE"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.data.options[0].value }}",
+        "options": {
+          "systemMessage": "You are a joke bot for discord. You reply with a joke based on the user input\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        240,
+        0
+      ],
+      "id": "6910d669-4d3f-4ed9-9a95-e9031bbe533d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        240,
+        176
+      ],
+      "id": "9e88a67a-7466-457d-8b49-ba94e2f89e96",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "REPLACE",
+          "name": "REPLACE"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nfor (const item of $input.all()) {\n  const text = item.json.output; // your joke string\n \n  // Replace backslashes first to avoid double-escaping them\n  let escaped = text.replace(/\\\\/g, '\\\\\\\\');\n \n  // Then escape double quotes\n  escaped = escaped.replace(/\"/g, '\\\\\"');\n \n  item.json.escapedContent = escaped;\n}\n \nreturn $input.all();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        0
+      ],
+      "id": "e0ada6fb-4377-4fc3-9e19-8390d39caa17",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "=POST",
+        "url": "=\nhttps://discord.com/api/v10/webhooks/{{ $('Webhook').item.json.body.application_id }}/{{ $('Webhook').item.json.body.token }}\n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.escapedContent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        832,
+        0
+      ],
+      "id": "1f292578-1722-41e8-96d9-b65ee2250dc6",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REPLACE"
+  }
+}
